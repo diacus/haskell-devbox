@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure we are in project root
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$PROJECT_DIR"
+REPO_URL="https://github.com/diacus/haskell-devbox"
+TARBALL_URL="$REPO_URL/archive/refs/heads/main.tar.gz"
+SUBDIR="haskell-devbox-main"
 
+echo "▶ Bootstrapping haskell-devbox..."
+
+TMP_DIR="$(mktemp -d)"
+
+curl -L "$TARBALL_URL" -o "$TMP_DIR/repo.tar.gz"
+tar -xzf "$TMP_DIR/repo.tar.gz" -C "$TMP_DIR"
+
+mv "$TMP_DIR/$SUBDIR/"* .
+
+rm -rf "$TMP_DIR"
+
+echo "✔ Project files downloaded."
+
+PROJECT_DIR="$(pwd)"
 BINARY_DIR="$PROJECT_DIR/.local/bin"
 WRAPPER="$PROJECT_DIR/docker-wrapper.sh"
 
 echo "▶ Building and starting container..."
-docker compose up --build -d $SERVICE
+docker compose up --build -d "$SERVICE"
 
 echo "▶ Ensuring wrapper is executable..."
 chmod +x "$WRAPPER"
@@ -24,7 +38,6 @@ done
 
 echo "▶ Discovering binaries inside container..."
 
-# List executables inside ghcup bin directory
 BINARIES=$(docker exec "$CONTAINER" sh -c \
   'find "$HOME/.ghcup/bin" -maxdepth 1 -executable -printf "%f\n"')
 
