@@ -5,6 +5,11 @@ REPO_URL="https://github.com/diacus/haskell-devbox"
 TARBALL_URL="$REPO_URL/archive/refs/heads/main.tar.gz"
 SUBDIR="haskell-devbox-main"
 
+USER_ID=$(id -u)
+GROUP_ID=$(id -g)
+CONTAINER=devbox
+SERVICE=devbox
+
 echo "▶ Bootstrapping haskell-devbox..."
 
 TMP_DIR="$(mktemp -d)"
@@ -13,7 +18,6 @@ curl -L "$TARBALL_URL" -o "$TMP_DIR/repo.tar.gz"
 tar -xzf "$TMP_DIR/repo.tar.gz" -C "$TMP_DIR"
 
 mv "$TMP_DIR/$SUBDIR/"* .
-
 rm -rf "$TMP_DIR"
 
 echo "✔ Project files downloaded."
