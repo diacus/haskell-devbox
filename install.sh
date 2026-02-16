@@ -27,7 +27,8 @@ BINARY_DIR="$PROJECT_DIR/.local/bin"
 WRAPPER="$PROJECT_DIR/docker-wrapper.sh"
 
 echo "▶ Building and starting container..."
-docker compose up --build -d "$SERVICE"
+USER_ID=$(id -u) GROUP_ID=$(id -g) CONTAINER=devbox SERVICE=devbox \
+       docker compose up --build -d 
 
 echo "▶ Ensuring wrapper is executable..."
 chmod +x "$WRAPPER"
@@ -50,5 +51,16 @@ echo "▶ Generating symlinks..."
 for BINARY in $BINARIES; do
   ln -sf "$WRAPPER" "$BINARY_DIR/$BINARY"
 done
+
+echo "▶ Saving environment variables to .envrc..."
+
+cat > .envrc <<EOF
+export USER_ID=$USER_ID
+export GROUP_ID=$GROUP_ID
+export CONTAINER=$CONTAINER
+export SERVICE=$SERVICE
+EOF
+
+echo "▶ Enable the environment with `direnv allow`"
 
 echo "✔ Installation complete."
