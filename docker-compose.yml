@@ -1,0 +1,14 @@
+services:
+  devbox:
+    build:
+      context: .
+      args:
+        UID: ${USER_ID}
+        GID: ${GROUP_ID}
+        USERNAME: ${USER}
+    container_name: ${CONTAINER}
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
