@@ -1,0 +1,150 @@
+#+TITLE: Haskell Devbox
+#+AUTHOR: Diego Guzmán
+#+OPTIONS: toc:2 num:nil
+
+A reproducible, portable, and isolated Haskell development environment.
+
+Built on Docker.
+Designed to feel native.
+
+The idea is simple:
+
+- The compiler lives inside a container
+- Your source code lives on your machine
+- Executables are exposed locally via a thin wrapper
+- The environment is declarative and repeatable
+
+No global installations.  
+No system pollution.  
+No “works on my machine”.
+
+* Features
+
+- Fully isolated Haskell toolchain
+- Container user mapped to your UID/GID
+- Transparent wrapper for ghc, cabal, stack, hlint, etc.
+- Optional direnv integration
+- One-command installation
+- No need to clone the repository
+
+* Requirements
+
+- Docker
+- Docker Compose (modern `docker compose` plugin)
+- curl
+- (Optional) direnv
+
+* Quick Installation
+
+Inside an empty directory:
+
+#+begin_src bash
+curl -L https://raw.githubusercontent.com/diacus/haskell-devbox/main/install.sh | bash
+#+end_src
+
+The installer will:
+
+1. Download the project
+2. Build the Docker image
+3. Start the container
+4. Discover executables inside ~/.ghcup/bin in the container
+5. Create symlinks in .local/bin/
+6. Generate a .envrc file with the required environment variables
+
+After installation, your directory will contain:
+
+#+begin_example
+.local/bin/
+docker-compose.yml
+Dockerfile
+docker-wrapper.sh
+.envrc
+#+end_example
+
+* Activating the Environment
+
+If you use direnv:
+
+#+begin_src bash
+direnv allow
+#+end_src
+
+This will:
+
+- Export SERVICE, CONTAINER, USER_ID and GROUP_ID
+- Add .local/bin to your PATH automatically
+
+If you do not use direnv, manually add:
+
+#+begin_src bash
+export PATH="$PWD/.local/bin:$PATH"
+#+end_src
+
+* How It Works
+
+The executables inside .local/bin are not real binaries.
+
+They are symlinks to:
+
+#+begin_example
+docker-wrapper.sh
+#+end_example
+
+The wrapper:
+
+1. Translates host paths to container paths
+2. Executes the corresponding binary inside the container
+3. Forwards stdout and stderr transparently
+
+From your shell’s perspective, ghc appears to be installed locally.
+In reality, it runs entirely inside the devbox container.
+
+* Environment Variables
+
+The installer generates a file:
+
+#+begin_example
+.envrc
+#+end_example
+
+With contents similar to:
+
+#+begin_example
+export USER_ID=...
+export GROUP_ID=...
+export CONTAINER=devbox
+export SERVICE=devbox
+export PATH="$PWD/.local/bin:$PATH"
+#+end_example
+
+These variables:
+
+- Ensure correct file ownership inside the container
+- Identify the Docker service
+- Allow the wrapper to function consistently
+
+* Philosophy
+
+haskell-devbox does not replace your system.
+
+It creates a declarative development capsule around your project.
+
+Each directory can have its own devbox.
+Each devbox can use its own GHC version.
+Each project remains independent.
+
+The result is stability without friction.
+
+* Uninstall
+
+To stop and remove the container:
+
+#+begin_src bash
+docker compose down -v
+#+end_src
+
+To fully clean the directory:
+
+#+begin_src bash
+rm -rf .local .envrc docker-compose.yml Dockerfile docker-wrapper.sh
+#+end_src
