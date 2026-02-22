@@ -59,7 +59,7 @@ export USER_ID=$USER_ID
 export GROUP_ID=$GROUP_ID
 export CONTAINER=$CONTAINER
 export SERVICE=$SERVICE
-export PATH=./.local/bin:$PATH
+export PATH=$PROJECT_DIR/.local/bin:$PATH
 EOF
 
 echo "▶ Enable the environment with `direnv allow`"
