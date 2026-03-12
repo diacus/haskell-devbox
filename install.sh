@@ -16,27 +16,14 @@ SERVICE="devbox"
 TMP_DIR="$(mktemp -d)"
 
 
-echo "▶ Saving environment variables to .envrc..."
-
-cat > .envrc <<EOF
-export USER_ID=$USER_ID
-export GROUP_ID=$GROUP_ID
-export CONTAINER=$CONTAINER
-export SERVICE=$SERVICE
-export PATH=$PROJECT_DIR/.local/bin:$PATH
-EOF
-
-echo "▶ Enable the environment with `direnv allow`"
-
-direnv allow
-
-
 echo "▶ Bootstrapping $SERVICE..."
 
 curl -L "$TARBALL_URL" -o "$TMP_DIR/repo.tar.gz"
 tar -xzf "$TMP_DIR/repo.tar.gz" -C "$TMP_DIR"
 
-mv "$TMP_DIR/$SUBDIR/"* .
+mv "$TMP_DIR/$SUBDIR/Dockerfile" .
+mv "$TMP_DIR/$SUBDIR/docker-compose.yml" .
+mv "$TMP_DIR/$SUBDIR/docker-wrapper.sh" .
 rm -rf "$TMP_DIR"
 
 echo "✔ Project files downloaded."
@@ -66,5 +53,19 @@ echo "▶ Generating symlinks..."
 for BINARY in $BINARIES; do
   ln -sf "$WRAPPER" "$BINARY_DIR/$BINARY"
 done
+
+echo "▶ Saving environment variables to .envrc..."
+
+cat > .envrc <<EOF
+export USER_ID=$USER_ID
+export GROUP_ID=$GROUP_ID
+export CONTAINER=$CONTAINER
+export SERVICE=$SERVICE
+export PATH=$PROJECT_DIR/.local/bin:$PATH
+EOF
+
+echo "▶ Enable the environment with \`direnv allow\`"
+
+direnv allow
 
 echo "✔ Installation complete."
