@@ -12,7 +12,7 @@ WRAPPER="$PROJECT_DIR/docker-wrapper.sh"
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 CONTAINER="$(basename $PROJECT_DIR)-devbox"
-SERVICE="$(basename $PROJECT_DIR)-devbox"
+SERVICE="devbox"
 TMP_DIR="$(mktemp -d)"
 
 
@@ -42,7 +42,7 @@ rm -rf "$TMP_DIR"
 echo "✔ Project files downloaded."
 
 echo "▶ Building and starting container..."
-USER_ID=$(id -u) GROUP_ID=$(id -g) CONTAINER="$(basename $PROJECT_DIR)-devbox" SERVICE="$(basename $PROJECT_DIR)-devbox" \
+USER_ID="$(id -u)" GROUP_ID="$(id -g)" CONTAINER="$(basename $PROJECT_DIR)-devbox" SERVICE="devbox" \
        docker compose up --build -d 
 
 echo "▶ Ensuring wrapper is executable..."
